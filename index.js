@@ -43,6 +43,7 @@ async function run(){
         const userCollection = client.db('royal_shuttle').collection('users')
         const newServiceCollection = client.db('royal_shuttle').collection('newService')
         const airportServiceCollection = client.db('royal_shuttle').collection('airportService')
+        const toursCollection = client.db('royal_shuttle').collection('tours')
         const reviewCollection = client.db('royal_shuttle').collection('reviews')
 
         const verifyAdmin = async(req, res, next) => {
@@ -181,6 +182,37 @@ async function run(){
           const updateDoc = req.body;
           const filter = {_id: ObjectId(id)}
           const result = await airportServiceCollection.updateOne(filter, {$set:{name: updateDoc.name, price: updateDoc.price, details: updateDoc.details, addPrice: updateDoc.addPrice}})
+          res.send(result)
+        })
+
+        app.get('/tours', async(req, res) => {
+          const tours = await toursCollection.find().toArray()
+          res.send(tours)
+        })
+
+        app.get('/tours/:id', verifyJWT,  verifyAdmin, async(req, res) => { 
+          const id = req.params.id
+          const result = await toursCollection.findOne({_id: ObjectId(id)})
+          res.send(result)
+        })
+
+        app.post('/tours', verifyJWT,  verifyAdmin, async(req, res) => {
+          const tours = req.body
+          const result = await toursCollection.insertOne(tours)
+          res.send(result)
+        })
+
+        app.put('/tours/:id', async(req, res) => {
+          const id = req.params.id
+          const updateDoc = req.body;
+          const filter = {_id: ObjectId(id)}
+          const result = await toursCollection.updateOne(filter, {$set:{name: updateDoc.name, price: updateDoc.price, details: updateDoc.details, addPrice: updateDoc.addPrice}})
+          res.send(result)
+        })
+
+        app.delete('/tours/:id', verifyJWT,  verifyAdmin, async(req, res) => { 
+          const id = req.params.id
+          const result = await toursCollection.deleteOne({_id: ObjectId(id)})
           res.send(result)
         })
 
